@@ -1,2 +1,2 @@
-# stockvisualiz.github.io
+# Stock-Visualization
 Interactive Visualization for Stock Market
