@@ -18,4 +18,14 @@ class ChartComponent extends React.Component {
 		}
 		return (
 			<div>
-				<div style={{fontSize:28,margin:20, textAlign:'center' }}>Interactive K-line stock information for 
+				<div style={{fontSize:28,margin:20, textAlign:'center' }}>Interactive K-line stock information for Apple Inc.</div>
+				<Chart data={this.state.data} />
+			</div>
+		)
+	}
+}
+
+render(
+	<ChartComponent />,
+	document.getElementById("root")
+);
