@@ -1,7 +1,29 @@
 <!doctype html>
 <html lang="en">
 
-<head>
+<head>    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <title>K-line Stock Market Visualization</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap-theme.min.css">
+    <style>
+        iframe{
+            width: 100%;
+            height: 700px;
+            border: 0px;
+            margin-top: 100px;
+        }
+        body{
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+
+<body>
     <div>
         <p>
             The dataset we selected for our analysis encompasses the stock price of Apple Inc. over the past several years. Given the extensive volume of data, which includes daily stock prices from the 1990s to the present, we narrowed our focus to the period from 2022 to the current date. This timeframe is interesting as it allows us to examine the impact of Apple's breakthrough product, the 'Vision Pro', on the stock price surrounding its release in June 2023.
@@ -33,26 +55,6 @@
             In addition to the basic chart, we integrated a more sophisticated graph using the 'react-stockcharts' package. This enhancement offers improved visual appeal and interactive functionalities like zooming and precise coordinate positioning. Although we utilized additional packages, this advanced chart serves to demonstrate how our initial design can be augmented with supplementary tools.
         </p>
     </div>
-    
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
-    <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="shortcut icon" href="/favicon.ico">
-    <title>K-line Stock Market Visualization</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap-theme.min.css">
-    <style>
-        iframe{
-            width: 100%;
-            height: 700px;
-            border: 0px;
-            margin-top: 100px;
-        }
-        body{
-            overflow-x: hidden;
-        }
-    </style>
-</head>
+</body>
 
 </html>

@@ -17,10 +17,7 @@ class ChartComponent extends React.Component {
 			return <div>Loading...</div>
 		}
 		return (
-			<div>
-				<div style={{fontSize:28,margin:20, textAlign:'center' }}>Interactive K-line (w/ react)</div>
-				<Chart data={this.state.data} />
-			</div>
+			<Chart data={this.state.data} />
 		)
 	}
 }
