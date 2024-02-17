@@ -1,14 +1,11 @@
-### Pre req
-node 6+
+### K-line interactive Apple Inc. stock information
 
-npm 3+
-
+Website: https://ericsun153.github.io/Stock-Visualization/https://ericsun153.github.io/Stock-Visualization/
 
 ```
-$ git clone https://github.com/rrag/react-stockcharts-examples2
-$ cd examples/<example you wish>
-
 $ npm install
 
-$ npm start # this should launch a browser with http://localhost:3000
+$ npm run 
+
+$ npm run start # this should launch a browser with http://localhost:3000
 ```
