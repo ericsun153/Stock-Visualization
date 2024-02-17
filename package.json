@@ -1,4 +1,5 @@
 {
+  "homepage": "http://ericsun153.github.io/Stock-Visualization",
   "name": "react-stockcharts-example2",
   "description": "Examples for react-stockcharts",
   "version": "0.0.24",
@@ -15,11 +16,13 @@
     "shortid": "^2.2.8"
   },
   "devDependencies": {
+    "gh-pages": "^6.1.1",
     "react-scripts": "^1.0.17"
   },
   "scripts": {
     "reinstall-deps": "rm -rf node_modules package-lock.json && npm i",
     "start": "react-scripts start",
+    "deploy": "gh-pages -d build",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
