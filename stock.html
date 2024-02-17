@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-line Stock Market Visualization</title>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+        }
+
+        #chart {
+            width: 100%;
+            height: 100%;
+        }
+
+        .candle {
+            fill: none;
+            stroke: #000;
+            stroke-width: 1px;
+        }
+
+        .up {
+            fill: #0f0;
+        }
+
+        .down {
+            fill: #f00;
+        }
+
+        .volume {
+            fill: #888;
+        }
+
+        .axis text {
+            font: 10px sans-serif;
+        }
+
+        .tooltip {
+            position: absolute;
+            pointer-events: none;
+            font-size: 8px;
+            opacity: 1;
+            width: 180px;
+            height: 150px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            padding-left: 100px;
+        }
+
+        .tooltip .item {
+            margin: 3px 0;
+        }
+        body{
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chart"></div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script> 
+        d3.csv('./AAPL.csv').then(data => {
+            console.log(data)
+            data = data.filter(d => new Date(d.Date) > new Date('2022')).map(d => {
+                return {
+                    ...d,
+                    // date: new Date(d.Date),
+                    high: d.High,
+                    low: d.Low,
+                    volume: d.Volume,
+                    date: d.Date,
+                    open: d.Open,
+                    close: d.Close,
+                }
+            })
+           
+            var tooltip=d3.select("body")
+            .append("div")
+            .attr("class","tooltip")
+            .style("background-color","#d3d3d3")
+            // .style("border-radius", "3px")
+            .style("padding","20px");
+
+            var margin = { top: 20, right: 120, bottom: 30, left: 40 },
+                width = 1920 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom,
+                volumeHeight = height / 3;
+
+            var x = d3.scaleTime().range([0, width]),
+                y = d3.scaleLinear().range([height, 0]),
+                yVolume = d3.scaleLinear().range([volumeHeight, 0]),
+                xAxis = d3.axisBottom(x),
+                yAxis = d3.axisLeft(y),
+                yVolumeAxis = d3.axisRight(yVolume);
+
+            var svg = d3.select("#chart")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            var klineLabel = svg.append("text")
+            .attr("x", -34)
+            .attr("y", 20)
+            .attr("dy", ".25em")
+            .text(function(d) { return 'USD' });
+
+            var volumeLabel = svg.append("text")
+            .attr("x", width)
+            .attr("y", height-270)
+            .attr("dy", ".25em")
+            .text(function(d) { return 'volume' });
+
+            var kLine = svg.append("g")
+                .attr("class", "k-line");
+
+            var volume = svg.append("g")
+                .attr("class", "volume")
+                .attr("transform", "translate(0," + (height - volumeHeight) + ")");
+
+            x.domain(d3.extent(data, function (d) { return new Date(d.date); }));
+            y.domain([
+                d3.min(data, function (d) { return Math.min(d.open, d.close); }),
+                d3.max(data, function (d) { return Math.max(d.open, d.close); })
+            ]);
+            yVolume.domain([0, d3.max(data, function (d) { return d.volume; })]);
+
+            kLine.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+
+            kLine.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            volume.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(" + width + ", 0)")
+                .call(yVolumeAxis);
+
+            volume.selectAll(".bar")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("x", function (d, i) {
+                    var w = width / data.length;
+                    return i * w;
+                })
+                .attr("y", function (d) {
+                    return yVolume(d.volume);
+                })
+                .attr("width", width / data.length)
+                .attr("height", function (d) {
+                    return volumeHeight - yVolume(d.volume);
+                })
+                .attr("fill", "#ddd")
+                .on("mouseover", function (d) {
+                    d3.select(this).attr("fill","#ccc")
+                    const data = d.target.__data__
+                    let html = '';
+                    ['Volume'].forEach(key => {
+                        html += `<div class="item"><b>${key}:&nbsp;&nbsp;&nbsp;</b><span>${data[key]}</span></div>`
+                    })
+
+                    tooltip.html(html).style("visibility","visible").style('height', '20px')
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY -10) + "px")
+
+                })
+                .on("mouseout", function (d, i) {
+                    d3.select(this).attr("fill","#ddd")
+                    tooltip.style('visibility', 'hidden')
+                });;
+
+            kLine.selectAll(".candle")
+                .data(data)
+                .enter()
+                .append("path")
+                .attr("class", function (d) { return d.close > d.open ? "candle up" : "candle down"; })
+                .attr("d", function (d) {
+                    var w = width / data.length;
+                    var open = y(d.open);
+                    var close = y(d.close);
+                    var high = Math.max(open, close);
+                    var low = Math.min(open, close);
+                    var middleLine = (open + close) / 2;
+                    var height = close - open;
+
+                    return "M" + (w * data.indexOf(d))
+                        + "," + high
+                        + "V" + low
+                        + "H" + (w * (data.indexOf(d) + 1))
+                        + "V" + middleLine
+                        + "H" + (w * data.indexOf(d))
+                        + "Z"
+                        + "M" + (w * data.indexOf(d))
+                        + "," + open
+                        + "L" + (w * (data.indexOf(d) + 1))
+                        + "," + close;
+                })
+                .attr("fill", function (d) { return d.close > d.open ? "green" : "red"; })
+                .attr("stroke", function (d) { return d.close > d.open ? "green" : "red"; })
+                .on("mouseover", function (d) {
+                    const data = d.target.__data__
+                    
+                    let html = '';
+                    ['Date', 'Open','Close','High','Low','Adj Close'].forEach(key => {
+                        html += `<div class="item"><b>${key}:&nbsp;&nbsp;&nbsp;</b><span>${data[key]}</span></div>`
+                    })
+
+                    tooltip.html(html).style("visibility","visible").style('height', '150px')
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY -10) + "px")
+
+                })
+                .on("mouseout", function (d, i) {
+                    d3.select(this)
+                        .attr("stroke-width", "0.2px")
+                    tooltip.style('visibility', 'hidden')
+                });
+
+            // Zoom and Pan Functionality  
+            var zoom = d3.zoom()
+                .scaleExtent([1, 10])
+                .on("zoom", zoomed);
+
+            svg.call(zoom);
+
+            function zoomed(event) {
+                if (event.transform) {
+                    x.domain(event.transform.rescaleX(x.domain()));
+                    kLine.select(".x.axis").call(xAxis);
+                    volume.select(".y.axis").call(yVolumeAxis);
+                    kLine.selectAll(".candle").attr("d", candlePath);
+                    volume.selectAll(".bar").attr("x", function (d, i) {
+                        return i * (width / data.length) * event.transform.k;
+                    }).attr("width", width / data.length / event.transform.k);
+                }
+            }
+
+            // Helper function to create the candlestick path  
+            function candlePath(d) {
+                var w = width / data.length;
+                var open = y(d.open);
+                var close = y(d.close);
+                var high = Math.max(open, close);
+                var low = Math.min(open, close);
+                var middleLine = (open + close) / 2;
+                var height = close - open;
+
+                return "M" + (w * data.indexOf(d))
+                    + "," + high
+                    + "V" + low
+                    + "H" + (w * (data.indexOf(d) + 1))
+                    + "V" + middleLine
+                    + "H" + (w * data.indexOf(d))
+                    + "Z"
+                    + "M" + (w * data.indexOf(d))
+                    + "," + open
+                    + "L" + (w * (data.indexOf(d) + 1))
+                    + "," + close;
+            }
+        })
+    </script>
+</body>
+
+</html>
